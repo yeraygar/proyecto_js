@@ -1,12 +1,7 @@
 let maxBall = 100;
 
 let badballscount = 2;
-
-let BallposX;
-let BallposY;
-//let size = [];
 let badballs = [];
-let shots = [];
 
 
 
@@ -23,8 +18,6 @@ class Ball {
 	this.positionX = mouseX;
 	this.positionY = mouseY;
 	this.size = 20;
-	//BallposX = this.positionX;
-	//BallposY = this.positionY
 	}
 
 	display() {
@@ -102,8 +95,7 @@ class Badball {
 		this.positionY += this.speedY;
 
 		if (this.positionX < 0 || this.positionX > width) {
-			//this.speedX *= -1;
-			this.positionX -= this.positionX;
+			this.positionX = 0;
 
 		if (badballs.length == 1 && this.currentCount == 5 && badballs.length <= maxBall) {
 			this.currentCount--;
