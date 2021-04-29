@@ -7,7 +7,6 @@ let BallposY;
 //let size = [];
 let badballs = [];
 let shots = [];
-let boolShot = false;
 
 
 
@@ -65,7 +64,7 @@ class Shot {
 
 	move() {
 		this.posX = this.posX;
-		this.posY -= 30;
+		this.posY -= 20;
 		if(this.posY < 0 || this.posY > height){
 			this.maxpos = true;
 		}
@@ -122,7 +121,6 @@ class Badball {
 
 		if (this.positionY < 0 || this.positionY > height) {
 			this.speedY *= -1;
-			//this.positionY -= this.positionY;
 
 		if (badballs.length == 1 && this.currentCount == 5 && badballs.length <= maxBall) {
 			this.currentCount--;
@@ -133,7 +131,8 @@ class Badball {
 
 		}else if(this.currentCount == 0 && badballs.length <= maxBall ) {
 			this.currentCount = this.countR + 5;
-			setTimeout(function(){badballs.push(new Badball());},5000);
+			setTimeout( function() 
+				{ badballs.push(new Badball()); } ,5000);
 			}
 		}
 	}
@@ -147,7 +146,6 @@ function setup() {
 	createCanvas(windowWidth, windowHeight);
 	myBall = new Ball();
 	badballs.push(new Badball());
-	myshot.push(new Shot());
 }
 
 
@@ -158,17 +156,11 @@ function draw() {
 	for(i = 0; i < myshot.length; i++) {
 	if(myshot[i].maxpos) {
 			myshot.splice(i,1);
-		}
+	}
 
-		else if(boolShot) {
-		
-		if(myshot[i].cont == 0) {
-			myshot[i].posX = mouseX;
-			myshot[i].posY = mouseY;
-			myshot[i].cont++;
-		}
+	if(myshot.length != 0){
 		myshot[i].move();
-		myshot[i].display();
+		myshot[i].display();	
 	}
 }
 
@@ -179,7 +171,6 @@ function draw() {
 }
 
 function mouseClicked() {
-	boolShot = true;
 	myshot.push(new Shot());
 }
 
