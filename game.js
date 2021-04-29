@@ -51,7 +51,7 @@ class Shot {
 	}
 
 	display() {
-		fill(255,0,0);
+		fill(255,0,199);
 		ellipse(this.posX,this.posY,this.size);
 	}
 
@@ -163,7 +163,7 @@ function draw() {
 }
 
 function mouseClicked() {
-	myshot.push(new Shot());
+	setTimeout(() => {myshot.push(new Shot());},100);
 }
 
 function windowResized() {
