@@ -1,15 +1,31 @@
 let maxBall = 100;
+
 let badballscount = 2;
-let positionX = [];
-let positionY = [];
-let size = [];
+
+let BallposX;
+let BallposY;
+//let size = [];
 let badballs = [];
 let shots = [];
+let boolShot = false;
+
+
+
+/***************
+*			   *
+*			   *
+*  Class Ball  *
+*			   *
+*			   *
+***************/
+
 class Ball {
 	constructor() {
 	this.positionX = mouseX;
 	this.positionY = mouseY;
 	this.size = 20;
+	//BallposX = this.positionX;
+	//BallposY = this.positionY
 	}
 
 	display() {
@@ -22,28 +38,48 @@ class Ball {
 		this.positionY = mouseY;
 	}
 
-	shot() {
-		myshot = new shot();
-		shots.push(myshot);
-		myshot.display();
-	}
 }
 
-class shot {
+
+/***************
+*			   *
+*			   *
+*  Class Shot  *
+*			   *
+*			   *
+***************/
+
+class Shot {
 	constructor() {
-		this.positionX = mouseX;
-		this.positionY = mouseY;
-		this.speedX = 8;
-		this.size = 7;
+		this.posX = mouseX;
+		this.posY = mouseY;
+		this.cont = 0;
+		this.size = 10;
+		this.maxpos = false;
 	}
 
-	display(){
-		fill(255,255,0);
-		ellipse(this.positionX,this.positionY,this.size);
+	display() {
+		fill(255,0,0);
+		ellipse(this.posX,this.posY,this.size);
+	}
+
+	move() {
+		this.posX = this.posX;
+		this.posY -= 20;
+		if(this.posY < 0 || this.posY > height){
+			this.maxpos = true;
+		}
 	}
 
 }
 
+/*****************
+*			     *
+*			     *
+*  Class Badball *
+*			     *
+*			     *
+*****************/
 
 class Badball {
 	constructor() {
@@ -104,11 +140,14 @@ class Badball {
 }
 
 let myBall;
+let myshot;
+
 function setup() {
 	noStroke();
 	createCanvas(windowWidth, windowHeight);
 	myBall = new Ball();
 	badballs.push(new Badball());
+	myshot = new Shot();
 }
 
 
@@ -116,15 +155,31 @@ function draw() {
 	background(165,255,255);
 	myBall.move();
 	myBall.display();
+	if(myshot.maxpos) {
+			myshot = new Shot();
+			boolShot = false;
+		}
+	else if(boolShot) {
+		
+		if(myshot.cont == 0) {
+			myshot.posX = mouseX;
+			myshot.posY = mouseY;
+			myshot.cont++;
+		}
+		myshot.move();
+		myshot.display();
+	}
+
 	for(i = 0; i < badballs.length; i++){
 		badballs[i].move();
 		badballs[i].display();
 	}
 }
-function mouseClicked(){
-myBall.shot();
+
+function mouseClicked() {
+	boolShot = true;
 }
 
-function windowResized(){
+function windowResized() {
 	resizeCanvas(windowWidth,windowHeight);
 }
