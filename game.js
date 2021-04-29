@@ -65,7 +65,7 @@ class Shot {
 
 	move() {
 		this.posX = this.posX;
-		this.posY -= 20;
+		this.posY -= 30;
 		if(this.posY < 0 || this.posY > height){
 			this.maxpos = true;
 		}
@@ -140,14 +140,14 @@ class Badball {
 }
 
 let myBall;
-let myshot;
+let myshot = [];
 
 function setup() {
 	noStroke();
 	createCanvas(windowWidth, windowHeight);
 	myBall = new Ball();
 	badballs.push(new Badball());
-	myshot = new Shot();
+	myshot.push(new Shot());
 }
 
 
@@ -155,20 +155,22 @@ function draw() {
 	background(165,255,255);
 	myBall.move();
 	myBall.display();
-	if(myshot.maxpos) {
-			myshot = new Shot();
-			boolShot = false;
+	for(i = 0; i < myshot.length; i++) {
+	if(myshot[i].maxpos) {
+			myshot.splice(i,1);
 		}
-	else if(boolShot) {
+
+		else if(boolShot) {
 		
-		if(myshot.cont == 0) {
-			myshot.posX = mouseX;
-			myshot.posY = mouseY;
-			myshot.cont++;
+		if(myshot[i].cont == 0) {
+			myshot[i].posX = mouseX;
+			myshot[i].posY = mouseY;
+			myshot[i].cont++;
 		}
-		myshot.move();
-		myshot.display();
+		myshot[i].move();
+		myshot[i].display();
 	}
+}
 
 	for(i = 0; i < badballs.length; i++){
 		badballs[i].move();
@@ -178,6 +180,7 @@ function draw() {
 
 function mouseClicked() {
 	boolShot = true;
+	myshot.push(new Shot());
 }
 
 function windowResized() {
