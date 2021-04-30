@@ -75,7 +75,7 @@ class Shot {
 
 class Badball {
 	constructor() {
-		this.currentCount = 5;
+		this.currentCount = 3;
 		this.countR = 5 + badballs.length;
 		this.speedX = random(3,10);
 		this.speedY = random(3,10);
@@ -99,14 +99,14 @@ class Badball {
 
 		if (badballs.length == 1 && this.currentCount == 5 && badballs.length <= maxBall) {
 			this.currentCount--;
-			setTimeout(function(){badballs.push(new Badball());},5000);
+			setTimeout(function(){badballs.push(new Badball());},2000);
 
 		}else if (this.currentCount > 0 && badballs.length <= maxBall) {
 			this.currentCount--;
 
 		}else if (this.currentCount == 0 && badballs.length <= maxBall) {
 			this.currentCount = this.countR + 5;
-			setTimeout(function(){badballs.push(new Badball());},5000);
+			setTimeout(function(){badballs.push(new Badball());},2000);
 			}
 		}
 
@@ -145,6 +145,7 @@ function draw() {
 	background(165,255,255);
 	myBall.move();
 	myBall.display();
+	
 	for(i = 0; i < myshot.length; i++) {
 	if(myshot[i].maxpos) {
 			myshot.splice(i,1);
@@ -163,7 +164,7 @@ function draw() {
 }
 
 function mouseClicked() {
-	setTimeout(() => {myshot.push(new Shot());},100);
+	myshot.push(new Shot());
 }
 
 function windowResized() {
