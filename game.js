@@ -145,18 +145,20 @@ function draw() {
 	background(165,255,255);
 	myBall.move();
 	myBall.display();
-	
+
+
 	for(i = 0; i < myshot.length; i++) {
-	if(myshot[i].maxpos) {
-			myshot.splice(i,1);
-	}
 
 	if(myshot.length != 0){
 		myshot[i].move();
 		myshot[i].display();	
 	}
-}
 
+	if(myshot[i].maxpos) {
+			myshot.splice(i,1);
+	}
+
+}
 	for(i = 0; i < badballs.length; i++){
 		badballs[i].move();
 		badballs[i].display();
