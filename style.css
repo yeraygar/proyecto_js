@@ -3,6 +3,10 @@ html, body {
     padding: 0;
 }
 
+h1 {
+    position: fixed;
+}
+
 canvas {
     display: block;
     /*margin: auto;*/
