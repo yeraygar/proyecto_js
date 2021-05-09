@@ -5,19 +5,23 @@
 *												*
 ************************************************/
 
-
+let backColor = [0,0,0];
 let maxBall = 100;
 let badballscount = 2;
 let dificult = 1;
+let rounds = 1;
 let rects = 1;
 let badballs = [];
 let collide = false;
 let time_respawn = 5000;
-let time = [0,0];
+//let time = [0,0];
 let points = 0;
 let myBall;
 let myshot = [];
-setInterval(function(){String_time();},1000);
+let isClean = false;
+let timeout = [];
+
+//setInterval(function(){String_time();},1000);
 
 
 /*****************************************************************************************************************************************************/
@@ -120,15 +124,27 @@ class Shot {
 
 class Badball {
 	constructor() {
-		this.lifes = 2;
-		this.c = color(255,0,0); 
-		this.currentCount = 5;
-		this.countR = 3 + badballs.length;
-		this.speedX = random(5,10);
-		this.speedY = random(5,10);
-		this.size = 30;
-		this.positionY = 0;
-		this.positionX = random(windowWidth);
+			this.lifes = 2;
+			this.c = color(255,0,0); 
+			this.currentCount = 5;
+			this.countR = 3 + badballs.length;
+			this.speedX = random(5,10);
+			this.speedY = random(5,10);
+			this.size = 30;
+			this.positionY = 0;
+			this.positionX = random(windowWidth);
+
+			if (rounds == 2) {
+			this.lifes = 4;
+			this.c = color(0,255,255);
+			this.currentCount = 5;
+			this.countR = 3 + badballs.length;
+			this.speedX = random(10,12);
+			this.speedY = random(10,12);
+			this.size = 100;
+			this.positionX = random(windowWidth);
+			this.positionY = 0;
+		}
 	}
 
 	display() {
@@ -143,46 +159,32 @@ class Badball {
 
 		if (this.positionX < 0 || this.positionX > width) {
 			this.positionX = 0;
-
-		if (badballs.length == 1 && this.currentCount == 5 && badballs.length <= maxBall) {
-			this.currentCount--;
-			setTimeout(function(){badballs.push(new Badball());},2000);
-
-		}else if (this.currentCount > 0 && badballs.length <= maxBall) {
-			this.currentCount--;
-
-		}else if (this.currentCount == 0 && badballs.length <= maxBall) {
-			this.currentCount = this.countR + 5;
-			setTimeout(function(){badballs.push(new Badball());},2000);
-			}
 		}
 
 
 		if (this.positionY < 0 || this.positionY > height) {
 			this.speedY *= -1;
-
-		if (badballs.length == 1 && this.currentCount == 5 && badballs.length <= maxBall) {
-			this.currentCount--;
-			setTimeout(function(){badballs.push(new Badball());},5000);
-
-		}else if (this.currentCount > 0 && badballs.length <= maxBall ) {
-			this.currentCount--;
-
-		}else if(this.currentCount == 0 && badballs.length <= maxBall ) {
-			this.currentCount = this.countR + 5;
-			setTimeout( function() 
-				{ badballs.push(new Badball()); } ,time_respawn);
-			}
-			time_respawn += 1000;
-		}
 	}
+}
 
 	collision(other) {
 	
 		let hit = collideRectCircle(this.positionX,this.positionY,this.size * 2, this.size,other.positionX,other.positionY,other.size);
 		if(hit) {
 			if(myshot.includes(other)) {
-				if( this.lifes == 2) {
+				if (this.lifes == 4) {
+					this.lifes -= 1;
+					this.c = color(255,255,0);
+					myshot.splice(myshot.indexOf(other),1);
+					collide = true;
+				} 
+				else if (this.lifes == 3) {
+					this.lifes -= 1;
+					this.c = color(255,0,0);
+					myshot.splice(myshot.indexOf(other),1);
+					collide = true;
+				}
+				else if ( this.lifes == 2) {
 					this.lifes -= 1;
 					this.c = color(0,0,255);
 					myshot.splice(myshot.indexOf(other),1);
@@ -192,9 +194,35 @@ class Badball {
 					collide = true;
 					badballs.splice(badballs.indexOf(this),1);
 					myshot.splice(myshot.indexOf(other),1);
-					setTimeout( function() 
-				{ 
-					generateBad(); } ,5000);
+					timeGenerate(2);
+					points++;
+					if (points >= 20 && points <= 40) {
+						if (!isClean) {
+							badballs.splice(0,badballs.length);
+							timeout.forEach(e => {
+								if(timeout.indexOf(e) != timeout.length -1 && timeout.indexOf(e) != timeout.length -2 ) {
+									clearTimeout(e);
+								}
+							})
+							timeout = timeout.slice(timeout.length -2);
+							isClean = true;
+						}
+						rounds  = 2;
+						if(points == 39) {
+							isClean = false;
+						}
+
+					} else if (points >= 40 && points <= 100) {
+						if(!isClean) {
+							badballs.splice(0,badballs.length);
+							timeout.forEach( e => {
+								clearTimeout(e);
+							});
+							timeout = timeout.splice(0,timeout.length);
+							isClean = true;
+						}
+
+					}
 				}
 			}
 			else if(other instanceof Ball) {
@@ -241,7 +269,7 @@ function setup() {
 /* [Draw] */
 
 function draw() {
-	background(165,255,255);
+	background(backColor[0],backColor[1],backColor[2]);
 	myBall.move();
 	myBall.display();
 
@@ -315,27 +343,39 @@ function endGame() {
 /* [Generate BadBalls] */
 
 function generateBad() {
-	if(dificult <= 20) {
-		for(x = 0; x < rects; x++) {
-			badballs.push(new Badball());
-		}
-
-	}else if(dificult <= 40) {
-		rects++;
-		for(x = 0; x < rects; x++) {
-			badballs.push(new Badball());
-		}
-	}else {
-		rects ++;
-		for(x = 0; x < rects; x++) {
-			badballs.push(new Badball());
-		}
-	}
-	dificult ++;
+	badballs.push(new Badball());
 }
 
 /************************************************************************/
 
+function timeGenerate (t) {
+	let x = 1;
+	let time;
+	if (badballs.length < 6) {
+	while (x <= t) {
+		if (x == 1) {
+			if (rounds == 2) {
+				time = setTimeout( function() {
+					generateBad();
+				},2000);
+				timeout.push(time);
+			} else {
+				time = setTimeout( function() {
+					generateBad();
+				},1000);
+				timeout.push(time);
+			}
+				x++;
+		} else if (x == 2){
+			time = setTimeout( function() {
+				generateBad();
+			},7000);
+			timeout.push(time);
+			x++;
+		}
+	 }
+	}
+}
 
 
 
@@ -366,3 +406,8 @@ function String_time() {
 }
 
 /************************************************************************/
+
+function victory() {
+	alert('You win');
+	location.reload();
+}
