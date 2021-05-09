@@ -136,7 +136,7 @@ class Badball {
 
 			if (rounds == 2) {
 			this.lifes = 4;
-			this.c = color(0,255,255);
+			this.c = color(255,255,0);
 			this.currentCount = 5;
 			this.countR = 3 + badballs.length;
 			this.speedX = random(10,12);
@@ -196,31 +196,38 @@ class Badball {
 					myshot.splice(myshot.indexOf(other),1);
 					timeGenerate(2);
 					points++;
-					if (points >= 20 && points <= 40) {
+					if (points >= 20 && points < 35) {
+
+						rounds  = 2;
+
 						if (!isClean) {
 							badballs.splice(0,badballs.length);
 							timeout.forEach(e => {
 								if(timeout.indexOf(e) != timeout.length -1 && timeout.indexOf(e) != timeout.length -2 ) {
 									clearTimeout(e);
 								}
-							})
-							timeout = timeout.slice(timeout.length -2);
+							});
+							timeout.slice(timeout.length-2);
 							isClean = true;
 						}
-						rounds  = 2;
-						if(points == 39) {
+
+						if(points == 34) {
 							isClean = false;
 						}
 
-					} else if (points >= 40 && points <= 100) {
+
+					} else if (points == 35) {
 						if(!isClean) {
 							badballs.splice(0,badballs.length);
-							timeout.forEach( e => {
-								clearTimeout(e);
-							});
+							timeout.forEach( e => { clearTimeout(e);});
 							timeout = timeout.splice(0,timeout.length);
 							isClean = true;
 						}
+						/*
+							Aqui va el código que ocurrirá después de acabar la segunda ronda
+						*/
+						rounds++;
+						victory()
 
 					}
 				}
@@ -351,29 +358,34 @@ function generateBad() {
 function timeGenerate (t) {
 	let x = 1;
 	let time;
-	if (badballs.length < 6) {
-	while (x <= t) {
-		if (x == 1) {
-			if (rounds == 2) {
-				time = setTimeout( function() {
-					generateBad();
-				},2000);
-				timeout.push(time);
-			} else {
-				time = setTimeout( function() {
-					generateBad();
-				},1000);
-				timeout.push(time);
+	if(rounds == 2) {
+		if (badballs.length < 4) {
+			while (x <= t) {
+				if (x == 1) {
+					time = setTimeout( function() { generateBad(); }, 2000);
+					timeout.push(time);
+					x++;
+				}else if (x == 2) {
+					time = setTimeout( function() { generateBad(); }, 7000);
+					timeout.push(time);
+					x++;
+				}
 			}
-				x++;
-		} else if (x == 2){
-			time = setTimeout( function() {
-				generateBad();
-			},7000);
-			timeout.push(time);
-			x++;
 		}
-	 }
+	}else if (rounds == 1) {
+		if (badballs.length < 6) {
+			while (x <= t) {
+				if (x == 1) {
+					time = setTimeout( function() { generateBad(); }, 1000);
+					timeout.push(time);
+					x++;
+				}else if (x == 2) {
+					time = setTimeout( function() { generateBad(); }, 7000);
+					timeout.push(time);
+					x++;
+				}
+			}
+		}
 	}
 }
 
