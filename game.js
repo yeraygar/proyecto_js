@@ -20,8 +20,7 @@ let myBall;
 let myshot = [];
 let isClean = false;
 let timeout = [];
-
-//setInterval(function(){String_time();},1000);
+let isFinalRound = false;
 
 
 /*****************************************************************************************************************************************************/
@@ -135,16 +134,16 @@ class Badball {
 			this.positionX = random(windowWidth);
 
 			if (rounds == 2) {
-			this.lifes = 4;
-			this.c = color(255,255,0);
-			this.currentCount = 5;
-			this.countR = 3 + badballs.length;
-			this.speedX = random(10,12);
-			this.speedY = random(10,12);
-			this.size = 100;
-			this.positionX = random(windowWidth);
-			this.positionY = 0;
-		}
+				this.lifes = 4;
+				this.c = color(255,255,0);
+				this.currentCount = 5;
+				this.countR = 3 + badballs.length;
+				this.speedX = random(12,15);
+				this.speedY = random(12,15);
+				this.size = 100;
+				this.positionX = random(windowWidth);
+				this.positionY = 0;
+			}
 	}
 
 	display() {
@@ -198,16 +197,17 @@ class Badball {
 					points++;
 					if (points >= 20 && points < 35) {
 
-						rounds  = 2;
+						if(rounds == 1) {
+							rounds  = 2;
+						}
 
 						if (!isClean) {
 							badballs.splice(0,badballs.length);
 							timeout.forEach(e => {
-								if(timeout.indexOf(e) != timeout.length -1 && timeout.indexOf(e) != timeout.length -2 ) {
 									clearTimeout(e);
-								}
 							});
-							timeout.slice(timeout.length-2);
+							timeout.splice(0,timeout.length);
+							setTimeout(function() {badballs.push(new Badball())}, 2000);
 							isClean = true;
 						}
 
@@ -222,13 +222,11 @@ class Badball {
 							timeout.forEach( e => { clearTimeout(e);});
 							timeout = timeout.splice(0,timeout.length);
 							isClean = true;
+							setTimeout(function() {isFinalRound = true}, 3000);
 						}
-						/*
-							Aqui va el código que ocurrirá después de acabar la segunda ronda
-						*/
-						rounds++;
-						victory()
-
+						if (rounds == 2) {
+							rounds = 3;
+						}
 					}
 				}
 			}
@@ -295,18 +293,25 @@ function draw() {
 }
 	collide = false;
 	
+	if (rounds == 1 || rounds == 2) {
 		for(y = 0; y < myshot.length && !collide; y++) {
 			for(x = 0; x < badballs.length && !collide; x++) {
 				badballs[x].collision(myshot[y]);
 			}
 		}
 
-	collide = false;	
+		collide = false;	
 
 		for(x = 0; x < badballs.length && !collide; x++){
 			badballs[x].collision(myBall);
 			badballs[x].move();
 			badballs[x].display();
+		}
+	}else {
+		badballs = null;
+		if(isFinalRound) {
+			victory();
+		}
 	}
 }
 
