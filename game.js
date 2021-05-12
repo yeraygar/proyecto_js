@@ -6,22 +6,20 @@
 ************************************************/
 
 let backColor = [0,0,0];
-let maxBall = 100;
-let badballscount = 2;
-let dificult = 1;
 let rounds = 1;
-let rects = 1;
 let badballs = [];
 let collide = false;
-let time_respawn = 5000;
-//let time = [0,0];
+let enemyCollide = false;
 let points = 0;
 let myBall;
 let myshot = [];
 let isClean = false;
 let timeout = [];
 let isFinalRound = false;
-
+let finalBoss;
+let number_enemyShots = 3;
+let enemyShots = [];
+let enemyShoted = false;
 
 /*****************************************************************************************************************************************************/
 /*****************************************************************************************************************************************************/
@@ -82,7 +80,6 @@ class Shot {
 	constructor() {
 		this.positionX = mouseX;
 		this.positionY = mouseY;
-		this.cont = 0;
 		this.size = 10;
 		this.maxpos = false;
 	}
@@ -125,8 +122,6 @@ class Badball {
 	constructor() {
 			this.lifes = 2;
 			this.c = color(255,0,0); 
-			this.currentCount = 5;
-			this.countR = 3 + badballs.length;
 			this.speedX = random(5,10);
 			this.speedY = random(5,10);
 			this.size = 30;
@@ -136,10 +131,8 @@ class Badball {
 			if (rounds == 2) {
 				this.lifes = 4;
 				this.c = color(255,255,0);
-				this.currentCount = 5;
-				this.countR = 3 + badballs.length;
-				this.speedX = random(12,15);
-				this.speedY = random(12,15);
+				this.speedX = random(11,13);
+				this.speedY = random(11,13);
 				this.size = 100;
 				this.positionX = random(windowWidth);
 				this.positionY = 0;
@@ -195,7 +188,7 @@ class Badball {
 					myshot.splice(myshot.indexOf(other),1);
 					timeGenerate(2);
 					points++;
-					if (points >= 20 && points < 35) {
+					if (points >= 2 && points < 4) {
 
 						if(rounds == 1) {
 							rounds  = 2;
@@ -211,18 +204,18 @@ class Badball {
 							isClean = true;
 						}
 
-						if(points == 34) {
+						if(points == 3) {
 							isClean = false;
 						}
 
 
-					} else if (points == 35) {
+					} else if (points == 4) {
 						if(!isClean) {
 							badballs.splice(0,badballs.length);
 							timeout.forEach( e => { clearTimeout(e);});
 							timeout = timeout.splice(0,timeout.length);
 							isClean = true;
-							setTimeout(function() {isFinalRound = true}, 3000);
+							setTimeout(function() {finalRound()}, 3000);
 						}
 						if (rounds == 2) {
 							rounds = 3;
@@ -236,6 +229,119 @@ class Badball {
 		}
 	}
 }
+
+/***************
+*			   *
+*			   *
+*  Class Boss  *
+*			   *
+*			   *
+***************/
+
+class Boss {
+	constructor() {
+			this.lifes = 500;
+			this.c = color(0,255,0); 
+			this.speedX = 12;
+			this.speedY = random(5,10);
+			this.size = 500;
+			this.positionY = 20;
+			this.positionX = (width / 2)-this.size;
+	}
+
+	display() {
+		fill(this.c);
+		rect(this.positionX,this.positionY,this.size * 2, this.size);
+	}
+
+	move() {
+
+		this.positionX += this.speedX;
+		this.positionY = this.positionY;
+
+		if (this.positionX < 0 || this.positionX > (windowWidth -(this.size *2))) {
+				this.speedX *= -1
+		}
+
+
+		if (this.positionY < 0 || this.positionY > height) {
+			this.speedY *= -1;
+		}
+	}
+
+	collision(other) {
+
+		let hit = collideRectCircle(this.positionX,this.positionY,this.size * 2, this.size,other.positionX,other.positionY,other.size);
+		if (hit) {
+			if (other instanceof Ball) {
+				endGame();
+			}else if (myshot.includes(other)) {
+				this.lifes -= 1;
+				myshot.splice(myshot.indexOf(other),1);
+				collide = true;
+				if (this.lifes <= 300 && this.lifes > 200) {
+					this.c = color(255,255,0);
+					number_enemyShots = 5;
+
+				} else if (this.lifes <= 200 && this.lifes > 100) {
+					this.c = color(255,150,0);
+					number_enemyShots = 10;
+
+				} else if (this.lifes <= 100 && this.lifes > 50) {
+				   this.c = color(255,0,0);
+				   number_enemyShots = 20;
+				   
+				} else if (this.lifes == 0) {
+					victory();
+				}
+				console.log(this.lifes);
+			}
+		}
+	}
+}
+
+
+/********************
+*			        *
+*			        *
+*  Class ShotEnemy  *
+*			        *
+*			        *
+********************/
+
+class ShotEnemy {
+	constructor(posY) {
+		this.positionX = finalBoss.positionX+finalBoss.size;
+		this.positionY = finalBoss.positionY+finalBoss.size;
+		this.size = 60;
+		this.maxpos = false;
+	}
+
+	display() {
+		fill(0,0,255);
+		ellipse(this.positionX,this.positionY,this.size);
+	}
+
+	move() {
+		this.positionX = this.positionX;
+		this.positionY += 15;
+		if(this.positionY > height) {
+			this.maxpos = true;
+		}
+	}
+
+	collision(other) {
+		let hit = collideCircleCircle(this.positionX,this.positionY,this.size,other.positionX,other.positionY,other.size);
+		if(hit) {
+			endGame();
+		}
+	}
+}
+
+
+
+
+
 
 
 /*****************************************************************************************************************************************************/
@@ -254,15 +360,13 @@ class Badball {
 *												*
 ************************************************/
 
-
-
-
 /* [Setup] */
 
 function setup() {
 	noStroke();
 	createCanvas(windowWidth, windowHeight);
 	myBall = new Ball();
+	finalBoss = new Boss();
 	badballs.push(new Badball());
 }
 
@@ -310,7 +414,44 @@ function draw() {
 	}else {
 		badballs = null;
 		if(isFinalRound) {
-			victory();
+			for (x = 0; x < myshot.length && !collide; x++) {
+				finalBoss.collision(myshot[x]);
+			}
+			
+			if(!enemyShoted) {
+				let time = 50;
+				for(x = 0; x < number_enemyShots; x++) {
+					setTimeout(function() {enemyShots.push(new ShotEnemy(finalBoss.positionY))}, time);
+					time += 100;
+				}
+				time = 50;
+				if (!enemyShoted) {
+					for (y = 0; y < number_enemyShots; y++) {
+						setTimeout(function() {enemyShots.push(new ShotEnemy(random(finalBoss.size)))}, time);
+						time += random(100,1000);
+					}
+					enemyShoted = true;
+
+				}
+				setTimeout(function() {enemyShoted = false}, 4000);
+		}
+
+			for (x = 0; x < enemyShots.length; x++) {
+				if (enemyShots.length != 0) {
+						enemyShots[x].display();
+						enemyShots[x].collision(myBall);
+						enemyShots[x].move();
+						if (enemyShots[x].maxpos) {
+							enemyShots.splice(x,1);
+							break;
+						}
+				}
+
+			}
+
+			finalBoss.collision(myBall);
+			finalBoss.move();
+			finalBoss.display();
 		}
 	}
 }
@@ -428,3 +569,11 @@ function victory() {
 	alert('You win');
 	location.reload();
 }
+
+/************************************************************************/
+
+function finalRound() {
+	isFinalRound = true;
+}
+
+/************************************************************************/
