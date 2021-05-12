@@ -42,11 +42,12 @@ class Ball {
 	constructor() {
 	this.positionX = mouseX;
 	this.positionY = mouseY;
+	this.c = color(255,215,0);
 	this.size = 20;
 	}
 
 	display() {
-		fill(255,215,0);
+		fill(this.c);
 		ellipse(this.positionX,this.positionY,this.size);
 	}
 
@@ -242,9 +243,9 @@ class Boss {
 	constructor() {
 			this.lifes = 500;
 			this.c = color(0,255,0); 
-			this.speedX = 12;
+			this.speedX = 10;
 			this.speedY = random(5,10);
-			this.size = 500;
+			this.size = 400;
 			this.positionY = 20;
 			this.positionX = (width / 2)-this.size;
 	}
@@ -313,18 +314,19 @@ class ShotEnemy {
 	constructor(posY) {
 		this.positionX = finalBoss.positionX+finalBoss.size;
 		this.positionY = finalBoss.positionY+finalBoss.size;
-		this.size = 60;
+		this.size = 50;
 		this.maxpos = false;
+		this.c = color(generateColor(),generateColor(),generateColor());
 	}
 
 	display() {
-		fill(0,0,255);
+		fill(this.c);
 		ellipse(this.positionX,this.positionY,this.size);
 	}
 
 	move() {
 		this.positionX = this.positionX;
-		this.positionY += 15;
+		this.positionY += 20;
 		if(this.positionY > height) {
 			this.maxpos = true;
 		}
@@ -577,3 +579,7 @@ function finalRound() {
 }
 
 /************************************************************************/
+
+function generateColor() {
+	return random(255);
+}
