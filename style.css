@@ -3,13 +3,21 @@ html, body {
     padding: 0;
 }
 
+body {
+    width: 100%;
+}
+
 canvas {
     display: block;
-    /*margin: auto;*/
+    z-index: -1;
     position: absolute;
     top: 0px;
     right: 0px;
     left: 0px;
     bottom: 0px;
     cursor: none;
+}
+
+h2 {
+    color: white;
 }

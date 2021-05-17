@@ -4,7 +4,16 @@
 *				 Main Variables					*
 *												*
 ************************************************/
-
+const body = document.querySelector('body');
+const container = document.querySelector('#container');
+container.style.display = 'flex';
+container.style.width = '15%';
+container.style.alignItems = 'center';
+const div_hud = document.createElement('div');
+div_hud.style.width = '100%';
+div_hud.style.marginLeft = '5px';
+const hud = document.createElement('div');
+const h2 = document.querySelector('h2');
 let backColor = [0,0,0];
 let rounds = 1;
 let badballs = [];
@@ -20,6 +29,7 @@ let finalBoss;
 let number_enemyShots = 3;
 let enemyShots = [];
 let enemyShoted = false;
+let num_enemies = 20;
 
 /*****************************************************************************************************************************************************/
 /*****************************************************************************************************************************************************/
@@ -37,13 +47,13 @@ let enemyShoted = false;
 *			   *
 ***************/
 
-
 class Ball {
 	constructor() {
+
 	this.positionX = mouseX;
 	this.positionY = mouseY;
-	this.c = color(255,215,0);
 	this.size = 20;
+	this.c = color(255,215,0);
 	}
 
 	display() {
@@ -189,10 +199,12 @@ class Badball {
 					myshot.splice(myshot.indexOf(other),1);
 					timeGenerate(2);
 					points++;
-					if (points >= 2 && points < 4) {
-
+					setNumEnemies();
+					if (points >= 20 && points < 35) {
 						if(rounds == 1) {
 							rounds  = 2;
+							num_enemies = 15;
+							h2.textContent = "Enemies: 15";
 						}
 
 						if (!isClean) {
@@ -205,12 +217,12 @@ class Badball {
 							isClean = true;
 						}
 
-						if(points == 3) {
+						if(points == 34) {
 							isClean = false;
 						}
 
 
-					} else if (points == 4) {
+					} else if (points == 35) {
 						if(!isClean) {
 							badballs.splice(0,badballs.length);
 							timeout.forEach( e => { clearTimeout(e);});
@@ -220,6 +232,17 @@ class Badball {
 						}
 						if (rounds == 2) {
 							rounds = 3;
+							h2.textContent = "Life: ";
+							container.appendChild(div_hud);
+							hud.textContent = '100%';
+							hud.style.backgroundColor = '#3bd904';
+							hud.style.height = '3%';
+							hud.style.width = '100%';
+							hud.style.textAlign = 'center';
+							hud.style.border = '2px solid black';
+							hud.style.borderRadius = '3px';
+							div_hud.appendChild(hud);
+							//body.style.display = 'flex';
 						}
 					}
 				}
@@ -278,18 +301,23 @@ class Boss {
 				endGame();
 			}else if (myshot.includes(other)) {
 				this.lifes -= 1;
+				hud.textContent = calcHud(this.lifes);
+				hud.style.width = calcHud(this.lifes);
 				myshot.splice(myshot.indexOf(other),1);
 				collide = true;
 				if (this.lifes <= 300 && this.lifes > 200) {
 					this.c = color(255,255,0);
+					hud.style.backgroundColor = 'yellow';
 					number_enemyShots = 5;
 
 				} else if (this.lifes <= 200 && this.lifes > 100) {
 					this.c = color(255,150,0);
+					hud.style.backgroundColor = 'orange';
 					number_enemyShots = 10;
 
 				} else if (this.lifes <= 100 && this.lifes > 50) {
 				   this.c = color(255,0,0);
+				   hud.style.backgroundColor = 'red';
 				   number_enemyShots = 20;
 				   
 				} else if (this.lifes == 0) {
@@ -582,4 +610,20 @@ function finalRound() {
 
 function generateColor() {
 	return random(255);
+}
+
+/************************************************************************/
+
+function setNumEnemies() {
+	num_enemies--;
+	h2.textContent = "Enemies: "+num_enemies;
+}
+
+/************************************************************************/
+
+function calcHud(n) {
+
+	let width = ((n * 100)/500).toFixed(1) + '%';
+	console.log(width);
+	return width;
 }
